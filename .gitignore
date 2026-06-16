@@ -55,3 +55,8 @@ Pemesanan/backup/
 *.png
 *.jpg
 *.jpeg
+
+# Folder modelling versi lama (hanya disimpan di lokal sebagai backup)
+Peramalan/(v2)modelling/
+Peramalan/(v3)modelling/
+
