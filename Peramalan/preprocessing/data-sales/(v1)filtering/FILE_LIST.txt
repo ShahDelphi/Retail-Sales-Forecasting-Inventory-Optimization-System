@@ -1,0 +1,90 @@
+﻿# File Inventory - (v1)filtering
+Generated: 2026-05-17 21:15:50
+
+================================================================================
+PYTHON SCRIPTS
+================================================================================
+ABC_analysist.py                                             2,685 bytes
+combined.py                                                  4,605 bytes
+not-null_clean.py                                              935 bytes
+sales_clean.py                                               5,097 bytes
+split-dataset-by-dept.py                                       883 bytes
+time-series-dataset.py                                       3,441 bytes
+
+================================================================================
+DATA FOLDERS
+================================================================================
+
+Folder: fix_data-sales\ (3 files, 577.15 MB)
+--------------------------------------------------------------------------------
+  fix_data-sales\final_dataset.csv                                 605,155,878
+  fix_data-sales\final_dataset.xlsx                                      3,276
+  fix_data-sales\final_dataset_sample.xlsx                              30,970
+
+Folder: new-dataset\ (29 files, 1167.59 MB)
+--------------------------------------------------------------------------------
+  new-dataset\abc_summary_per_sku.csv                                  310,034
+  new-dataset\final_dataset_abc.csv                                  2,012,465
+  new-dataset\final_dataset_clean.csv                              245,969,449
+  new-dataset\split-dataset\.csv\dataset_A.csv                         361,467
+  new-dataset\split-dataset\.csv\dataset_B.csv                         428,473
+  new-dataset\split-dataset\.csv\dataset_C.csv                       1,222,669
+  new-dataset\split-dataset\.xlsx\dataset_A.xlsx                       276,855
+  new-dataset\split-dataset\.xlsx\dataset_B.xlsx                       330,693
+  new-dataset\split-dataset\.xlsx\dataset_C.xlsx                       878,659
+  new-dataset\split-dataset\backup time-series\time-series\timeseries_A.csv     118,245,175
+  new-dataset\split-dataset\backup time-series\time-series\timeseries_B.csv      74,066,905
+  new-dataset\split-dataset\backup time-series\time-series\timeseries_C.csv      39,651,312
+  new-dataset\split-dataset\backup time-series\time-series\fruit\timeseries_A.csv      46,512,909
+  new-dataset\split-dataset\backup time-series\time-series\fruit\timeseries_B.csv      28,672,344
+  new-dataset\split-dataset\backup time-series\time-series\fruit\timeseries_C.csv      14,695,882
+  new-dataset\split-dataset\backup time-series\time-series\vegetable\timeseries_A.csv      71,685,481
+  new-dataset\split-dataset\backup time-series\time-series\vegetable\timeseries_B.csv      45,394,917
+  new-dataset\split-dataset\backup time-series\time-series\vegetable\timeseries_C.csv      25,002,024
+  new-dataset\split-dataset\by-abc\dataset_FRUIT_ABC.csv             1,168,570
+  new-dataset\split-dataset\by-abc\dataset_VEGETABLE_ABC.csv         1,218,561
+  new-dataset\split-dataset\by-abc\final_dataset_abc.csv             2,387,039
+  new-dataset\split-dataset\by-dept\dataset_FRUIT.csv               96,029,490
+  new-dataset\split-dataset\by-dept\dataset_VEGETABLE.csv          150,019,999
+  new-dataset\split-dataset\time-series\fruit\timeseries_A.csv      52,275,643
+  new-dataset\split-dataset\time-series\fruit\timeseries_B.csv      32,100,006
+  new-dataset\split-dataset\time-series\fruit\timeseries_C.csv      16,382,527
+  new-dataset\split-dataset\time-series\vegetable\timeseries_A.csv      79,461,853
+  new-dataset\split-dataset\time-series\vegetable\timeseries_B.csv      50,035,794
+  new-dataset\split-dataset\time-series\vegetable\timeseries_C.csv      27,514,571
+
+Folder: promo\ (1 files, 0.54 MB)
+--------------------------------------------------------------------------------
+  promo\promotion_discount_clean.csv                                   562,434
+
+Folder: sales_clean\ (25 files, 498.8 MB)
+--------------------------------------------------------------------------------
+  sales_clean\all_sales_clean.csv                                  254,563,359
+  sales_clean\clean_20260322_114050_MR_TotalSalesByDayBySKU_2410091.csv       5,462,634
+  sales_clean\clean_20260322_114153_MR_TotalSalesByDayBySKU_2410091.csv       5,074,237
+  sales_clean\clean_20260322_114239_MR_TotalSalesByDayBySKU_2410091.csv       7,911,598
+  sales_clean\clean_20260322_114339_MR_TotalSalesByDayBySKU_2410091.csv       7,697,320
+  sales_clean\clean_20260322_115036_MR_TotalSalesByDayBySKU_2410091.csv       7,850,213
+  sales_clean\clean_20260322_115123_MR_TotalSalesByDayBySKU_2410091.csv       7,983,751
+  sales_clean\clean_20260322_115207_MR_TotalSalesByDayBySKU_2410091.csv       8,251,445
+  sales_clean\clean_20260322_115254_MR_TotalSalesByDayBySKU_2410091.csv       8,260,465
+  sales_clean\clean_20260322_115352_MR_TotalSalesByDayBySKU_2410091.csv       9,489,845
+  sales_clean\clean_20260322_121659_MR_TotalSalesByDayBySKU_2410091.csv       9,830,296
+  sales_clean\clean_20260322_121752_MR_TotalSalesByDayBySKU_2410091.csv      10,811,181
+  sales_clean\clean_20260322_121859_MR_TotalSalesByDayBySKU_2410091.csv      11,223,031
+  sales_clean\clean_20260322_122033_MR_TotalSalesByDayBySKU_2410091.csv      11,031,087
+  sales_clean\clean_20260322_122128_MR_TotalSalesByDayBySKU_2410091.csv      11,293,782
+  sales_clean\clean_20260322_122213_MR_TotalSalesByDayBySKU_2410091.csv      12,736,906
+  sales_clean\clean_20260322_122303_MR_TotalSalesByDayBySKU_2410091.csv      11,788,121
+  sales_clean\clean_20260322_122347_MR_TotalSalesByDayBySKU_2410091.csv      12,412,270
+  sales_clean\clean_20260322_122437_MR_TotalSalesByDayBySKU_2410091.csv      13,059,998
+  sales_clean\clean_20260322_122527_MR_TotalSalesByDayBySKU_2410091.csv      14,150,132
+  sales_clean\clean_20260322_122619_MR_TotalSalesByDayBySKU_2410091.csv      15,886,352
+  sales_clean\clean_20260322_122705_MR_TotalSalesByDayBySKU_2410091.csv      15,733,633
+  sales_clean\clean_20260322_122845_MR_TotalSalesByDayBySKU_2410091.csv      16,296,473
+  sales_clean\clean_20260322_122930_MR_TotalSalesByDayBySKU_2410091.csv      15,877,405
+  sales_clean\clean_20260322_123021_MR_TotalSalesByDayBySKU_2410091.csv      18,357,032
+
+================================================================================
+TOTAL: 67 files, 2244.12 MB (2.19 GB)
+================================================================================

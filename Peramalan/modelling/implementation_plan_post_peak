@@ -1,0 +1,87 @@
+# Implementasi Fitur PostPeakPromo (Opsi 1)
+
+## Latar Belakang
+
+Grafik Oktober 2025 menunjukkan gap besar antara nilai aktual dan prediksi model (SARIMAX, LSTM, Hybrid).
+Penyebabnya: **September 2025 hampir seluruhnya berstatus Promo=1** dengan rata-rata sales ~1.5 miliar/hari,
+hampir 2x lipat dari bulan-bulan lain. Model "terkontaminasi" pola ini dan mengekstrapolasi nilai
+tinggi ke Oktober — padahal Oktober sudah kembali normal.
+
+**Solusi**: Tambah fitur exogenous `PostPeakPromo` — flag biner yang menandai bahwa bulan sebelumnya
+memiliki rata-rata sales yang sangat tinggi (di atas mean + 1 std), sehingga model belajar untuk
+"menurunkan ekspektasi" di periode pasca-peak.
+
+## Logika Fitur PostPeakPromo
+
+Untuk setiap hari di dataset:
+1. Hitung rata-rata Sales bulan sebelumnya (`PrevMonthAvg`)
+2. Hitung threshold = `overall_mean + 1 × overall_std` dari seluruh data training
+3. Jika `PrevMonthAvg > threshold` → `PostPeakPromo = 1`, selainnya `0`
+
+**Verifikasi untuk kasus September → Oktober:**
+- Overall mean Sales (fruit class A): ~505 juta
+- Overall std: ~325 juta  
+- Threshold: ~830 juta
+- September mean: **~1.5 miliar** → jauh di atas threshold → Oktober = PostPeakPromo **1** ✅
+- Bulan lain (Agt, Nop, dst): ~500–700 juta → di bawah threshold → PostPeakPromo **0** ✅
+
+## Perubahan yang Direncanakan
+
+---
+
+### validation_class_A.py
+
+#### [MODIFY] Fungsi `train_predict_sarimax`
+Tambahkan `'PostPeakPromo'` ke dalam `exog_cols`:
+```python
+# Sebelum
+exog_cols = ['Weekend', 'Holiday', 'Promo'] if use_promo else ['Weekend', 'Holiday']
+
+# Sesudah
+exog_cols = ['Weekend', 'Holiday', 'Promo', 'PostPeakPromo'] if use_promo else ['Weekend', 'Holiday', 'PostPeakPromo']
+```
+
+#### [MODIFY] Fungsi `train_predict_lstm`
+Sama seperti SARIMAX — tambahkan `'PostPeakPromo'` ke `exog_cols`.
+
+#### [MODIFY] Fungsi `validate_class`
+Setelah membuat `class_df`, tambahkan komputasi fitur baru sebelum loop validasi:
+```python
+# Hitung PostPeakPromo
+class_df['YearMonth'] = class_df['Date'].dt.to_period('M')
+monthly_avg_by_period = class_df.groupby('YearMonth')['Sales'].mean()
+overall_mean = class_df['Sales'].mean()
+overall_std  = class_df['Sales'].std()
+threshold    = overall_mean + overall_std
+class_df['PrevMonthAvg'] = class_df['YearMonth'].map(
+    lambda ym: monthly_avg_by_period.get(ym - 1, 0)
+)
+class_df['PostPeakPromo'] = (class_df['PrevMonthAvg'] > threshold).astype(int)
+class_df = class_df.drop(columns=['YearMonth', 'PrevMonthAvg'])
+```
+
+---
+
+### validation_class_BC.py
+
+> [!IMPORTANT]
+> File ini mungkin juga terpengaruh jika class B dan C memiliki pola spike yang sama.
+> Perlu diterapkan perubahan yang sama agar konsisten.
+
+---
+
+## Verification Plan
+
+### Setelah implementasi:
+1. Jalankan `validation_class_A.py` — lihat apakah gap di grafik Oktober berkurang
+2. Bandingkan MAPE/MAE/RMSE Oktober sebelum vs. sesudah penambahan fitur
+3. Pastikan November tidak terdampak negatif (November seharusnya tidak terpengaruh karena Oktober tidak ada spike)
+
+## Open Questions
+
+> [!IMPORTANT]
+> Apakah perubahan ini juga perlu diterapkan ke:
+> - `validation_class_BC.py`?
+> - `forecasting_class_A.py` dan `forecasting_class_BC.py`?
+> 
+> Atau cukup di `validation_class_A.py` dulu untuk melihat hasilnya?

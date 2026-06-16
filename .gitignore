@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+*.egg-info/
+.eggs/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# === DATA TESIS SENSITIF & UKURAN BESAR (PRIVASI) ===
+# Menghindari data bocor ke GitHub dan kegagalan push akibat ukuran file >100MB
+
+# Mengabaikan semua file dataset & kompresi di seluruh repositori
+*.csv
+*.xlsx
+*.xls
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Mengabaikan dokumen naskah/proposal (Word)
+*.docx
+*.doc
+*.pdf
+
+# Perkecualian: Jika ingin tetap men-track file metrik kecil yang aman di-share
+# !validation_metrics_summary_*.csv
+
+# Mengabaikan folder data/sales spesifik
+Sales/
+Promo/
+Master Item/
+BOM/
+Shelf Life/
+Peramalan/Sales/
+Peramalan/Tambahan Sales/
+Peramalan/modelling/dataset/
+Pemesanan/dataset/
+Pemesanan/output/
+Pemesanan/backup/
+
+# Mengabaikan plot gambar hasil peramalan yang dihasilkan otomatis
+*.png
+*.jpg
+*.jpeg

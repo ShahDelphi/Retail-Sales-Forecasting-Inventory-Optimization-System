@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "Peramalan/modelling"
+		},
+		{
+			"path": "Pemesanan"
+		},
+		{
+			"path": "Peramalan/preprocessing"
+		}
+	],
+	"settings": {}
+}

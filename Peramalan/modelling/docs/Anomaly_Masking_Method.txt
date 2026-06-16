@@ -1,0 +1,120 @@
+================================================================================
+METODE ANOMALY MASKING PADA DATA TRAINING
+Peramalan Penjualan Buah & Sayur — Class A
+================================================================================
+
+1. LATAR BELAKANG
+--------------------------------------------------------------------------------
+Selama proses validasi model untuk bulan Oktober 2025, ditemukan gap yang sangat
+besar antara nilai prediksi dan nilai aktual (MAPE SARIMAX >150%, MAPE LSTM >35%).
+Setelah investigasi data, ditemukan bahwa bulan September 2025 mengalami lonjakan
+penjualan (spike) yang sangat tidak normal:
+
+  - Fruit  : rata-rata Sales September 2025 ~1,5 miliar, sedangkan bulan normal
+             sekitar 500-700 juta (sekitar 2-3x lipat di atas normal)
+  - Vegetable : rata-rata Sales September 2025 ~511 juta, sedangkan bulan normal
+                sekitar 200-270 juta (sekitar 2x lipat di atas normal)
+
+Lonjakan ini diduga disebabkan oleh event promosi besar atau faktor eksternal
+musiman yang tidak berulang secara reguler. Karena model (SARIMAX, LSTM, Hybrid)
+dilatih menggunakan seluruh data historis termasuk September 2025, model
+"belajar" bahwa level penjualan tinggi tersebut adalah pola normal, sehingga
+forecast Oktober 2025 (yang kembali ke level normal) menjadi terlalu tinggi.
+
+
+2. SOLUSI: ANOMALY MASKING (TARGETED PERIOD REPLACEMENT)
+--------------------------------------------------------------------------------
+Pendekatan yang dipilih adalah mengganti nilai pada periode anomali yang
+diketahui (September 2025) dengan rolling median sebelum data digunakan
+untuk melatih model. Metode ini disebut "Anomaly Masking" atau
+"Targeted Period Replacement".
+
+Langkah-langkah:
+  a. Hitung rolling median dari seluruh kolom target (Sales / Sales Qty)
+     dengan window 30 hari dan center=True, sehingga nilai pengganti
+     mencerminkan tren lokal di sekitar titik yang diganti.
+  b. Identifikasi seluruh baris pada data training yang bertanggal
+     di bulan September 2025 (anomaly_year=2025, anomaly_month=9).
+  c. Ganti nilai pada baris tersebut dengan rolling median yang
+     telah dihitung pada langkah (a).
+  d. Data di luar September 2025 tidak diubah sama sekali.
+
+Fungsi implementasi (Python):
+
+    def mask_anomaly_period(train_df, col, anomaly_year=2025,
+                            anomaly_month=9, window=30):
+        df = train_df.copy()
+        rolling_med = df[col].rolling(window, center=True,
+                                      min_periods=5).median()
+        rolling_med = rolling_med.ffill().bfill()
+        anomaly_mask = (
+            (df['Date'].dt.year  == anomaly_year) &
+            (df['Date'].dt.month == anomaly_month)
+        )
+        df.loc[anomaly_mask, col] = rolling_med[anomaly_mask].values
+        return df[col]
+
+Fungsi ini dipanggil untuk kolom 'Sales' dan 'Sales Qty' pada train_df
+sebelum proses fitting SARIMAX, LSTM, maupun Hybrid dilakukan.
+
+
+3. ALASAN PEMILIHAN METODE INI
+--------------------------------------------------------------------------------
+Metode ini dipilih dibandingkan alternatif lain karena beberapa alasan:
+
+  a. TARGETED & EKSPLISIT
+     Hanya mengganti bulan yang secara domain knowledge diidentifikasi
+     sebagai anomali. Tidak ada perubahan pada bulan-bulan lain sehingga
+     tren historis jangka panjang tetap terjaga.
+
+  b. TIDAK ADA PARAMETER ARBITRER
+     Berbeda dengan metode IQR global (yang memerlukan threshold multiplier
+     seperti 1.5x atau 2.0x IQR), metode ini tidak bergantung pada
+     parameter statistik yang bisa subjektif. Keputusan masking didasarkan
+     pada pengetahuan kontekstual (domain knowledge) tentang data.
+
+  c. NILAI PENGGANTI YANG WAJAR
+     Rolling median 30 hari mempertahankan pola tren lokal di sekitar
+     September 2025, sehingga nilai pengganti tidak "flat" melainkan
+     masih mencerminkan dinamika musiman yang normal.
+
+  d. TIDAK MENGUBAH ARSITEKTUR MODEL
+     Perubahan hanya pada tahap preprocessing data training.
+     Model SARIMAX, LSTM, dan Hybrid SARIMAX-LSTM tetap sama persis,
+     sehingga kontribusi penelitian pada arsitektur model tidak berubah.
+
+  e. DAPAT DIREPLIKASI
+     Setiap kali validasi bulan Oktober, November, atau Desember 2025
+     dijalankan, masking September 2025 otomatis diterapkan secara
+     konsisten pada data training masing-masing bulan.
+
+
+4. PERBANDINGAN HASIL SEBELUM DAN SESUDAH ANOMALY MASKING
+--------------------------------------------------------------------------------
+(Class A — Oktober 2025)
+
+  Dept       | Target    | Model   | MAPE Sebelum | MAPE Sesudah
+  -----------|-----------|---------|--------------|-------------
+  fruit      | Sales Qty | SARIMAX |    138.39%   |   83.81%
+  fruit      | Sales Qty | LSTM    |    766.83%   |   36.54%
+  fruit      | Sales Qty | Hybrid  |    138.82%   |   83.14%
+  vegetable  | Sales Qty | SARIMAX |    150.23%   |   97.15%
+  vegetable  | Sales Qty | LSTM    |     35.56%   |   31.56%
+  vegetable  | Sales Qty | Hybrid  |    152.80%   |   98.94%
+
+Catatan: November & Desember 2025 tidak mengalami penurunan kualitas
+setelah masking diterapkan (MAPE tetap di kisaran 7-18%).
+
+
+5. KETERBATASAN
+--------------------------------------------------------------------------------
+  - Metode ini bersifat supervised: memerlukan identifikasi manual terhadap
+    periode anomali. Jika periode anomali tidak diketahui sebelumnya,
+    diperlukan metode deteksi otomatis (seperti IQR global atau Z-score).
+  - SARIMAX dan Hybrid untuk vegetable masih menunjukkan overestimation
+    di Oktober 2025 (MAPE ~97-99%), mengindikasikan bahwa penurunan level
+    penjualan vegetable di Oktober 2025 tidak sepenuhnya disebabkan oleh
+    spike September, tetapi juga oleh faktor lain yang tidak terekam
+    dalam fitur model (Weekend, Holiday, Promo).
+
+================================================================================
