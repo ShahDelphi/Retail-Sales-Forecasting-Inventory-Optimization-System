@@ -195,13 +195,9 @@ def validate_class_month(class_name, dept, class_df, year, month, month_name):
         target_name = target.replace(' ', '')
         daily_df[f'Actual_{target_name}'] = y_actual
         
-        # Untuk Fruit Class A menggunakan LSTM, sedangkan Vegetable Class A menggunakan SARIMAX
-        if dept == 'fruit':
-            daily_df[f'Forecast_{target_name}'] = lstm_pred
-            print(f"  [Output Config] {dept.upper()} Class {class_name} -> Menggunakan LSTM untuk Forecast_{target_name}")
-        else:
-            daily_df[f'Forecast_{target_name}'] = sarimax_pred
-            print(f"  [Output Config] {dept.upper()} Class {class_name} -> Menggunakan SARIMAX untuk Forecast_{target_name}")
+        # Menggunakan SARIMAX untuk Forecast_{target_name} pada semua departemen (Fruit & Vegetable)
+        daily_df[f'Forecast_{target_name}'] = sarimax_pred
+        print(f"  [Output Config] {dept.upper()} Class {class_name} -> Menggunakan SARIMAX untuk Forecast_{target_name}")
 
         print(f"\n  [ Range Check: {target} ]")
         print_range_check(f"Actual {target}", y_actual)
