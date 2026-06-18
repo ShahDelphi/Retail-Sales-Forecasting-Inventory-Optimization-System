@@ -248,14 +248,17 @@ for sku_code, sku_name in TARGET_ITEMS.items():
             fml(ws, r, ci("V"), f"=INT(W{r - lead_time}*Q{R})", bg=CLR_FORMULA_ROW)
 
         # W: Order (formula Excel murni)
+        lead_time = int(row_data['Lead_Time'])
         review_period = int(row_data['Review_Period'])
-        r_start = r + 1
-        r_end = r + review_period
+        r_start = r + lead_time
+        r_end = r + lead_time + review_period - 1
+        closing_stock_cell = f"X{r + lead_time - 1}"
+        
         if review_period == 1:
-            forecast_sum_formula = f"SUM(H{r_start})"
+            forecast_sum_formula = f"H{r_start}"
         else:
             forecast_sum_formula = f"SUM(H{r_start}:H{r_end})"
-        fml(ws, r, ci("W"), f'=IF(S{R}="Tidak",0,CEILING(MAX(0,K{R}+{forecast_sum_formula}-X{R}),AF{R}))', bg=CLR_FORMULA_ROW)
+        fml(ws, r, ci("W"), f'=IF(S{R}="Tidak",0,CEILING(MAX(0,K{R}+{forecast_sum_formula}-{closing_stock_cell}),AF{R}))', bg=CLR_FORMULA_ROW)
 
         # X: Closing_Stock = Opening_Stock - Actual (formula Excel murni)
         fml(ws, r, ci("X"),

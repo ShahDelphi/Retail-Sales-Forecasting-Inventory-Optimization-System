@@ -221,16 +221,20 @@ def run_simulation_solusi_a():
                     Waste_s[t] = round(Closing_Stock_s[t] * 0.3, 1) \
                                  if (Closing_Stock_s[t] > 0 and note_waste == "Ya") else 0
 
-                    # 5. Order_s[t] (dihitung setelah Closing_Stock_s[t] didapat)
-                    if note_order == "Ya":
-                        forecast_sum = 0
-                        for i in range(1, review_period + 1):
-                            fc_idx = t + i
-                            if fc_idx < n_days:
-                                forecast_sum += fc_s[fc_idx]
-                        Order_s[t] = math.ceil(max(0, SS_s + forecast_sum - Closing_Stock_s[t]) / moq) * moq
-                    else:
-                        Order_s[t] = 0
+                    # 5. Order_s[order_date] (dihitung secara retrospektif setelah Closing_Stock_s[t] tersedia)
+                    # Sesuai revisi: jika lead_time = LT, order di hari t_order menggunakan
+                    # closing stock hari t_order + LT - 1 (yaitu hari t) dan ramalan mulai t_order + LT (yaitu t + 1)
+                    order_date = t - lead_time + 1
+                    if order_date >= 0:
+                        if Note_Order_arr[order_date] == "Ya":
+                            forecast_sum = 0
+                            for i in range(1, review_period + 1):
+                                fc_idx = t + i
+                                if fc_idx < n_days:
+                                    forecast_sum += fc_s[fc_idx]
+                            Order_s[order_date] = math.ceil(max(0, SS_s + forecast_sum - Closing_Stock_s[t]) / moq) * moq
+                        else:
+                            Order_s[order_date] = 0
 
                 # Ambil rata-rata harga toko
                 avg_prices = np.array([
